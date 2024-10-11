@@ -82,10 +82,7 @@ class Gmail(object):
                 # Fallback to file storage if no dictionary is provided
                 store = file.Storage('gmail_token.json')
                 self.creds = store.get()
-
-            if not self.creds or self.creds.invalid:
-                # ... (rest of the authentication flow remains unchanged)
-
+            
             self._service = build(
                 'gmail', 'v1', http=self.creds.authorize(Http()),
                 cache_discovery=False
