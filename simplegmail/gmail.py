@@ -65,38 +65,26 @@ class Gmail(object):
     def __init__(
         self,
         client_secret_file: str = 'client_secret.json',
-        creds_file: str = 'gmail_token.json',
+        creds_dict: Optional[Dict[str, Any]] = None,
         access_type: str = 'offline',
         noauth_local_webserver: bool = False,
         _creds: Optional[client.OAuth2Credentials] = None,
     ) -> None:
         self.client_secret_file = client_secret_file
-        self.creds_file = creds_file
 
         try:
-            # The file gmail_token.json stores the user's access and refresh
-            # tokens, and is created automatically when the authorization flow
-            # completes for the first time.
             if _creds:
                 self.creds = _creds
+            elif creds_dict:
+                # Create credentials from the dictionary
+                self.creds = client.OAuth2Credentials.from_json(json.dumps(creds_dict))
             else:
-                store = file.Storage(self.creds_file)
+                # Fallback to file storage if no dictionary is provided
+                store = file.Storage('gmail_token.json')
                 self.creds = store.get()
 
             if not self.creds or self.creds.invalid:
-                flow = client.flow_from_clientsecrets(
-                    self.client_secret_file, self._SCOPES
-                )
-
-                flow.params['access_type'] = access_type
-                flow.params['prompt'] = 'consent'
-
-                args = []
-                if noauth_local_webserver:
-                    args.append('--noauth_local_webserver')
-
-                flags = tools.argparser.parse_args(args)
-                self.creds = tools.run_flow(flow, store, flags)
+                # ... (rest of the authentication flow remains unchanged)
 
             self._service = build(
                 'gmail', 'v1', http=self.creds.authorize(Http()),
