@@ -19,7 +19,7 @@ import mimetypes
 import os
 import re
 import threading
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from bs4 import BeautifulSoup
 import dateutil.parser as parser
